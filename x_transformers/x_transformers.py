@@ -1696,6 +1696,7 @@ class TransformerWrapper(Module):
 
         self.l2norm_embed = l2norm_embed
         self.token_emb = TokenEmbedding(emb_dim, num_tokens, l2norm_embed = l2norm_embed)
+        self.token_emb.requires_grad_(False)
 
         no_abs_pos_emb = max_seq_len == 0 or not (use_abs_pos_emb and not attn_layers.disable_abs_pos_emb)
 
@@ -1791,7 +1792,9 @@ class TransformerWrapper(Module):
 
         external_pos_emb = exists(pos) and pos.dtype != torch.long
         pos_emb = self.pos_emb(x, pos = pos, seq_start_pos = seq_start_pos) if not external_pos_emb else pos
-        x = self.token_emb(x) + pos_emb
+        # x = self.token_emb(x) + pos_emb
+        # skip token_emb
+        x = x + pos_emb
 
         # add additional embeddings
 
